@@ -303,18 +303,20 @@ public abstract class RpcClient implements Closeable {
                 }
             }
         });
-        
+        // Nacos服务端健康检查以及重连
         clientEventExecutor.submit(() -> {
             while (true) {
                 try {
                     if (isShutdown()) {
                         break;
                     }
+                    // 定时keepAliveTime(5000)毫秒内, 去检查服务端是否健康
                     ReconnectContext reconnectContext = reconnectionSignal
                             .poll(keepAliveTime, TimeUnit.MILLISECONDS);
                     if (reconnectContext == null) {
                         // check alive time.
                         if (System.currentTimeMillis() - lastActiveTimeStamp >= keepAliveTime) {
+                            // 健康检查
                             boolean isHealthy = healthCheck();
                             if (!isHealthy) {
                                 if (currentConnection == null) {
@@ -346,7 +348,7 @@ public abstract class RpcClient implements Closeable {
                         }
                         
                     }
-                    
+                    // 检查指定重连的服务端信息是否在所得到的服务列表内
                     if (reconnectContext.serverInfo != null) {
                         // clear recommend server if server is not in server list.
                         boolean serverExist = false;
@@ -362,11 +364,12 @@ public abstract class RpcClient implements Closeable {
                             LoggerUtils.printIfInfoEnabled(LOGGER,
                                     "[{}] Recommend server is not in server list, ignore recommend server {}", name,
                                     reconnectContext.serverInfo.getAddress());
-                            
+                            // 不在维护的服务列表内, 置空则默认是轮询服务列表当前下标的下一个服务
                             reconnectContext.serverInfo = null;
                             
                         }
                     }
+                    // 长连接重连Nacos
                     reconnect(reconnectContext.serverInfo, reconnectContext.onRequestFail);
                 } catch (Throwable throwable) {
                     // Do nothing
@@ -377,7 +380,7 @@ public abstract class RpcClient implements Closeable {
         // connect to server, try to connect to server sync RETRY_TIMES times, async starting if failed.
         Connection connectToServer = null;
         rpcClientStatus.set(RpcClientStatus.STARTING);
-        
+        // 重试三次 连接客户端
         int startUpRetryTimes = RETRY_TIMES;
         while (startUpRetryTimes > 0 && connectToServer == null) {
             try {
@@ -403,12 +406,14 @@ public abstract class RpcClient implements Closeable {
             rpcClientStatus.set(RpcClientStatus.RUNNING);
             eventLinkedBlockingQueue.offer(new ConnectionEvent(ConnectionEvent.CONNECTED));
         } else {
+            // 再次切换连接服务端
             switchServerAsync();
         }
-        
+        // 处理服务端主动发起的重置连接请求
         registerServerRequestHandler(new ConnectResetRequestHandler());
         
         // register client detection request.
+        // 服务端会有连接限制.
         registerServerRequestHandler(request -> {
             if (request instanceof ClientDetectionRequest) {
                 return new ClientDetectionResponse();

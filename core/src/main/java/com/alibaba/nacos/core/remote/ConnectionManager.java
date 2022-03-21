@@ -287,7 +287,7 @@ public class ConnectionManager extends Subscriber<ConnectionLimitRuleChangeEvent
      */
     @PostConstruct
     public void start() {
-        
+        // TODO 不健康连接剔除
         // Start UnHealthy Connection Expel Task.
         RpcScheduledExecutor.COMMON_SERVER_EXECUTOR.scheduleWithFixedDelay(new Runnable() {
             @Override

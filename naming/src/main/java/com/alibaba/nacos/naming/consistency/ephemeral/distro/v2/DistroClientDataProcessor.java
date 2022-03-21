@@ -89,7 +89,11 @@ public class DistroClientDataProcessor extends SmartSubscriber implements Distro
         result.add(ClientEvent.ClientVerifyFailedEvent.class);
         return result;
     }
-    
+
+    /**
+     * Distor协议 根据事件异步同步数据到Nacos集群其他节点
+     * @param event {@link Event}
+     */
     @Override
     public void onEvent(Event event) {
         if (EnvUtil.getStandaloneMode()) {
@@ -114,7 +118,7 @@ public class DistroClientDataProcessor extends SmartSubscriber implements Distro
         // Verify failed data should be sync directly.
         distroProtocol.syncToTarget(distroKey, DataOperation.ADD, event.getTargetServer(), 0L);
     }
-    
+
     private void syncToAllServer(ClientEvent event) {
         Client client = event.getClient();
         // Only ephemeral data sync by Distro, persist client should sync by raft.

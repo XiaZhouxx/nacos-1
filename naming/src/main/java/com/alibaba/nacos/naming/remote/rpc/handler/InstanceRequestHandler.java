@@ -32,6 +32,10 @@ import org.springframework.stereotype.Component;
 /**
  * Instance request handler.
  *
+ * 在2.0.0版本开始, 客户端和服务端的交互默认都是通过gRPC长连接的方式(ephemeral=true),
+ * 客户端对服务实例的操作更加内聚, 剥离了控制台操作服务实例的一系列逻辑
+ * 使得逻辑更为清晰.
+ *
  * @author xiweng.yy
  */
 @Component

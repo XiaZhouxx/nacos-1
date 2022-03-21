@@ -171,7 +171,12 @@ public class NamingClientProxyDelegate implements NamingClientProxy {
     public boolean serverHealthy() {
         return grpcClientProxy.serverHealthy() || httpClientProxy.serverHealthy();
     }
-    
+
+    /**
+     * 根据实例 isEphemeral 判断发起注册的方式(gRPC or HTTP)
+     * @param instance 注册实例对象
+     * @return
+     */
     private NamingClientProxy getExecuteClientProxy(Instance instance) {
         return instance.isEphemeral() ? grpcClientProxy : httpClientProxy;
     }

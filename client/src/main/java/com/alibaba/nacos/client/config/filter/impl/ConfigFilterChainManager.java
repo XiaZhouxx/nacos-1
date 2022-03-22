@@ -37,6 +37,7 @@ public class ConfigFilterChainManager implements IConfigFilterChain {
     private final List<IConfigFilter> filters = new ArrayList<IConfigFilter>();
     
     public ConfigFilterChainManager(Properties properties) {
+        // SPI加载实现 /META-INF/services
         ServiceLoader<IConfigFilter> configFilters = ServiceLoader.load(IConfigFilter.class);
         for (IConfigFilter configFilter : configFilters) {
             configFilter.init(properties);

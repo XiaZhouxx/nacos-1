@@ -44,6 +44,7 @@ import java.util.Properties;
 /**
  * Config Impl.
  *
+ * {@link com.alibaba.nacos.api.config.ConfigService}
  * @author Nacos
  */
 @SuppressWarnings("PMD.ServiceOrDaoClassShouldEndWithImplRule")

@@ -89,6 +89,10 @@ import static com.alibaba.nacos.api.common.Constants.ENCODE;
 /**
  * Long polling.
  *
+ * Client 监听/获取 config基类
+ *
+ * @see com.alibaba.nacos.client.config.NacosConfigService
+ *
  * @author Nacos
  */
 public class ClientWorker implements Closeable {
@@ -622,7 +626,7 @@ public class ClientWorker implements Closeable {
                 }
                 return null;
             });
-            
+            // 连接事件监听, 当连接建立时 会主动触发一次配置监听 -> startInternal()
             rpcClientInner.registerConnectionListener(new ConnectionEventListener() {
                 
                 @Override
@@ -688,6 +692,7 @@ public class ClientWorker implements Closeable {
             executor.schedule(() -> {
                 while (!executor.isShutdown() && !executor.isTerminated()) {
                     try {
+                        // 利用阻塞队列实现的定时任务(5秒), 同时还可以通过offer(v) 主动触发一次任务
                         listenExecutebell.poll(5L, TimeUnit.SECONDS);
                         if (executor.isShutdown() || executor.isTerminated()) {
                             continue;

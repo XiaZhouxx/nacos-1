@@ -383,6 +383,7 @@ public class ConnectionManager extends Subscriber<ConnectionLimitRuleChangeEvent
                     
                     String serverIp = null;
                     String serverPort = null;
+                    // 淘汰的存活连接重连服务地址, 默认为空, 由客户端自行轮询服务列表重连
                     if (StringUtils.isNotBlank(redirectAddress) && redirectAddress.contains(Constants.COLON)) {
                         String[] split = redirectAddress.split(Constants.COLON);
                         serverIp = split[0];

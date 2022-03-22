@@ -366,7 +366,8 @@ public class ConnectionManager extends Subscriber<ConnectionLimitRuleChangeEvent
                         }
                         
                     }
-                    
+
+                    // 当剩余总连接还是超过最大连接限制, 那么则淘汰SDK的连接
                     //3. if total count is still over limit.
                     if (expelCount > 0) {
                         for (Map.Entry<String, Connection> entry : entries) {
@@ -464,7 +465,7 @@ public class ConnectionManager extends Subscriber<ConnectionLimitRuleChangeEvent
                         latch.await(3000L, TimeUnit.MILLISECONDS);
                         Loggers.REMOTE_DIGEST
                                 .info("Out dated connection check successCount={}", successConnections.size());
-                        // 最后对于检测未通过的, 摘除服务
+                        // 最后对于检测未通过的, 摘除client和关闭连接
                         for (String outDateConnectionId : outDatedConnections) {
                             if (!successConnections.contains(outDateConnectionId)) {
                                 Loggers.REMOTE_DIGEST

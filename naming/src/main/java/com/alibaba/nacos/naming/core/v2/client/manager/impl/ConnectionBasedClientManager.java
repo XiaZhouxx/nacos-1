@@ -41,6 +41,11 @@ import java.util.concurrent.TimeUnit;
 /**
  * The manager of {@code ConnectionBasedClient}.
  *
+ * 通过继承监听器基类，当Client连接后,ConnectingManager 会调用ClientConnectionEventListener.clientConnected(Connection connect)
+ * 以此保存Client连接信息, 当client真正发起Register请求时会使用这个Client实体 InstanceRequestHandler
+ *
+ * @see ClientConnectionEventListener
+ * @see com.alibaba.nacos.core.remote.ConnectionManager register()
  * @author xiweng.yy
  */
 @Component("connectionBasedClientManager")
@@ -49,6 +54,7 @@ public class ConnectionBasedClientManager extends ClientConnectionEventListener 
     private final ConcurrentMap<String, ConnectionBasedClient> clients = new ConcurrentHashMap<>();
     
     public ConnectionBasedClientManager() {
+        // client 过期剔除任务
         GlobalExecutor
                 .scheduleExpiredClientCleaner(new ExpiredClientCleaner(this), 0, Constants.DEFAULT_HEART_BEAT_INTERVAL,
                         TimeUnit.MILLISECONDS);
@@ -134,7 +140,10 @@ public class ConnectionBasedClientManager extends ClientConnectionEventListener 
         }
         return false;
     }
-    
+
+    /**
+     * Client连接过期剔除
+     */
     private static class ExpiredClientCleaner implements Runnable {
         
         private final ConnectionBasedClientManager clientManager;
@@ -142,7 +151,7 @@ public class ConnectionBasedClientManager extends ClientConnectionEventListener 
         public ExpiredClientCleaner(ConnectionBasedClientManager clientManager) {
             this.clientManager = clientManager;
         }
-        
+
         @Override
         public void run() {
             long currentTime = System.currentTimeMillis();

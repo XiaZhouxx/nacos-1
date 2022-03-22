@@ -134,6 +134,7 @@ public class ConnectionManager extends Subscriber<ConnectionLimitRuleChangeEvent
     }
     
     /**
+     * 连接注册以及发布ClientConnectionEvent
      * register a new connect.
      *
      * @param connectionId connectionId
@@ -153,7 +154,7 @@ public class ConnectionManager extends Subscriber<ConnectionLimitRuleChangeEvent
             }
             connections.put(connectionId, connection);
             connectionForClientIp.get(connection.getMetaInfo().clientIp).getAndIncrement();
-            
+            // client注册, 通知
             clientConnectionEventListenerRegistry.notifyClientConnected(connection);
             Loggers.REMOTE_DIGEST
                     .info("new connection registered successfully, connectionId = {},connection={} ", connectionId,
@@ -319,16 +320,19 @@ public class ConnectionManager extends Subscriber<ConnectionLimitRuleChangeEvent
                         String appName = client.getMetaInfo().getAppName();
                         String clientIp = client.getMetaInfo().getClientIp();
                         if (client.getMetaInfo().isSdkSource() && !expelForIp.containsKey(clientIp)) {
+                            // 对单个客户端IP连接进行限制
                             //get limit for current ip.
                             int countLimitOfIp = connectionLimitRule.getCountLimitOfIp(clientIp);
+                            // 对单个applicationName 限制?
                             if (countLimitOfIp < 0) {
                                 int countLimitOfApp = connectionLimitRule.getCountLimitOfApp(appName);
                                 countLimitOfIp = countLimitOfApp < 0 ? countLimitOfIp : countLimitOfApp;
                             }
+                            // 默认限制(-1)
                             if (countLimitOfIp < 0) {
                                 countLimitOfIp = connectionLimitRule.getCountLimitPerClientIpDefault();
                             }
-                            
+                            // 判断是否需要对该客户端连接进行限制.
                             if (countLimitOfIp >= 0 && connectionForClientIp.containsKey(clientIp)) {
                                 AtomicInteger currentCountIp = connectionForClientIp.get(clientIp);
                                 if (currentCountIp != null && currentCountIp.get() > countLimitOfIp) {
@@ -357,6 +361,7 @@ public class ConnectionManager extends Subscriber<ConnectionLimitRuleChangeEvent
                             expelClient.add(client.getMetaInfo().getConnectionId());
                             expelCount--;
                         } else if (now - client.getMetaInfo().getLastActiveTime() >= KEEP_ALIVE_TIME) {
+                            // 距离上次心跳超期 20秒, 则认为其可能过时, 后续会主动发起一次健康检测请求
                             outDatedConnections.add(client.getMetaInfo().getConnectionId());
                         }
                         
@@ -382,11 +387,11 @@ public class ConnectionManager extends Subscriber<ConnectionLimitRuleChangeEvent
                         serverIp = split[0];
                         serverPort = split[1];
                     }
-                    
                     for (String expelledClientId : expelClient) {
                         try {
                             Connection connection = getConnection(expelledClientId);
                             if (connection != null) {
+                                // 当前NacosServer客户端连接过多, 驱除一些客户端连接, 发起连接重置请求 让其连接其他Nacos服务
                                 ConnectResetRequest connectResetRequest = new ConnectResetRequest();
                                 connectResetRequest.setServerIp(serverIp);
                                 connectResetRequest.setServerPort(serverPort);
@@ -403,7 +408,7 @@ public class ConnectionManager extends Subscriber<ConnectionLimitRuleChangeEvent
                             Loggers.REMOTE_DIGEST.error("Error occurs when expel connection, expelledClientId:{}", expelledClientId, e);
                         }
                     }
-                    
+                    // 超期(20秒)没有发起心跳 可能不健康的client, 主动发起一次健康检测
                     //4.client active detection.
                     Loggers.REMOTE_DIGEST.info("Out dated connection ,size={}", outDatedConnections.size());
                     if (CollectionUtils.isNotEmpty(outDatedConnections)) {
@@ -459,7 +464,7 @@ public class ConnectionManager extends Subscriber<ConnectionLimitRuleChangeEvent
                         latch.await(3000L, TimeUnit.MILLISECONDS);
                         Loggers.REMOTE_DIGEST
                                 .info("Out dated connection check successCount={}", successConnections.size());
-                        
+                        // 最后对于检测未通过的, 摘除服务
                         for (String outDateConnectionId : outDatedConnections) {
                             if (!successConnections.contains(outDateConnectionId)) {
                                 Loggers.REMOTE_DIGEST

@@ -69,7 +69,12 @@ public class GrpcRequestAcceptor extends RequestGrpc.RequestImplBase {
         }
         
     }
-    
+
+    /**
+     * 接收gRPC请求处理
+     * @param grpcRequest
+     * @param responseObserver
+     */
     @Override
     public void request(Payload grpcRequest, StreamObserver<Payload> responseObserver) {
         
@@ -165,6 +170,7 @@ public class GrpcRequestAcceptor extends RequestGrpc.RequestImplBase {
             requestMeta.setConnectionId(CONTEXT_KEY_CONN_ID.get());
             requestMeta.setClientVersion(connection.getMetaInfo().getVersion());
             requestMeta.setLabels(connection.getMetaInfo().getLabels());
+            // 刷新连接的最后活跃时间
             connectionManager.refreshActiveTime(requestMeta.getConnectionId());
             Response response = requestHandler.handleRequest(request, requestMeta);
             Payload payloadResponse = GrpcUtils.convert(response);

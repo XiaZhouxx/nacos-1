@@ -310,7 +310,7 @@ public abstract class RpcClient implements Closeable {
                     if (isShutdown()) {
                         break;
                     }
-                    // 定时keepAliveTime(5000)毫秒内, 去检查服务端是否健康
+                    // 定时keepAliveTime(5000)毫秒内, 去检查服务端是否健康(双向的, 同时服务端也利用这个请求做了连接 ActiveTime刷新)
                     ReconnectContext reconnectContext = reconnectionSignal
                             .poll(keepAliveTime, TimeUnit.MILLISECONDS);
                     if (reconnectContext == null) {

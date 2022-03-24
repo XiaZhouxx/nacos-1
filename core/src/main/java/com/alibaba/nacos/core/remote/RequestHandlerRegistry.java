@@ -78,6 +78,7 @@ public class RequestHandlerRegistry implements ApplicationListener<ContextRefres
             }
             
             try {
+                // 收集需要Tps控制的切入点
                 Method method = clazz.getMethod("handle", Request.class, RequestMeta.class);
                 if (method.isAnnotationPresent(TpsControl.class) && TpsControlConfig.isTpsControlEnabled()) {
                     TpsControl tpsControl = method.getAnnotation(TpsControl.class);
@@ -89,6 +90,7 @@ public class RequestHandlerRegistry implements ApplicationListener<ContextRefres
                 //ignore.
             }
             Class tClass = (Class) ((ParameterizedType) clazz.getGenericSuperclass()).getActualTypeArguments()[0];
+            // 保存请求处理器. 策略模式
             registryHandlers.putIfAbsent(tClass.getSimpleName(), requestHandler);
         }
     }

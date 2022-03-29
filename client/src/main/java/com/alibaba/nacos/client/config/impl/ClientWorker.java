@@ -728,13 +728,20 @@ public class ClientWorker implements Closeable {
                 synchronized (cache) {
                     
                     //check local listeners consistent.
+                    /*
+                     * 检查本地配置是否已经和服务端同步 .
+                     * 1. 添加 listener时默认 false
+                     * 2. 接收配置变更时 设置为false
+                     * 3. 最后一个监听器被移除 设置为false
+                     */
                     if (cache.isSyncWithServer()) {
                         cache.checkListenerMd5();
+                        // 已经和服务端同步过的配置, 需要等待全局刷新间隔(5分钟) 才会主动去服务端检查配置
                         if (!needAllSync) {
                             continue;
                         }
                     }
-                    
+
                     if (!CollectionUtils.isEmpty(cache.getListeners())) {
                         //get listen  config
                         if (!cache.isUseLocalConfigInfo()) {
@@ -774,7 +781,7 @@ public class ClientWorker implements Closeable {
                         timestampMap.put(GroupKey.getKeyTenant(cacheData.dataId, cacheData.group, cacheData.tenant),
                                 cacheData.getLastModifiedTs().longValue());
                     }
-                    
+                    // 批量配置监听请求
                     ConfigBatchListenRequest configChangeListenRequest = buildConfigRequest(listenCaches);
                     configChangeListenRequest.setListen(true);
                     try {
@@ -785,6 +792,7 @@ public class ClientWorker implements Closeable {
                             
                             Set<String> changeKeys = new HashSet<String>();
                             //handle changed keys,notify listener
+                            // 存在变更配置集, 通知对应本地CacheDate的listener
                             if (!CollectionUtils.isEmpty(configChangeBatchListenResponse.getChangedConfigs())) {
                                 hasChangedKeys = true;
                                 for (ConfigChangeBatchListenResponse.ConfigContext changeConfig : configChangeBatchListenResponse
@@ -794,6 +802,7 @@ public class ClientWorker implements Closeable {
                                                     changeConfig.getTenant());
                                     changeKeys.add(changeKey);
                                     boolean isInitializing = cacheMap.get().get(changeKey).isInitializing();
+                                    // 刷新配置
                                     refreshContentAndCheck(changeKey, !isInitializing);
                                 }
                                 

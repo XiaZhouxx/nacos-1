@@ -109,7 +109,7 @@ public class RpcConfigChangeNotifier extends Subscriber<LocalDataChangeEvent> {
             if (StringUtils.isNotBlank(tag) && !tag.equals(clientTag)) {
                 continue;
             }
-
+            // 配置变更通知请求, ClientWorker中监听了这个事件做配置变更
             ConfigChangeNotifyRequest notifyRequest = ConfigChangeNotifyRequest.build(dataId, group, tenant);
 
             RpcPushTask rpcPushRetryTask = new RpcPushTask(notifyRequest, 50, client, clientIp,
@@ -119,7 +119,12 @@ public class RpcConfigChangeNotifier extends Subscriber<LocalDataChangeEvent> {
         }
         Loggers.REMOTE_PUSH.info("push [{}] clients ,groupKey=[{}]", notifyClientCount, groupKey);
     }
-    
+
+    /**
+     * 处理本地配置变更 推送Client端变更数据 这里的调用链路比较复杂, 它首先利用ConfigDataChangeEvent事件将数据同步给cluster,
+     * 由cluster同步接口来处理配置变更,最终触发 ConfigCacheService 中的LocalDataChangeEvent
+     * @param event {@link Event}
+     */
     @Override
     public void onEvent(LocalDataChangeEvent event) {
         String groupKey = event.groupKey;
@@ -130,7 +135,7 @@ public class RpcConfigChangeNotifier extends Subscriber<LocalDataChangeEvent> {
         String group = strings[1];
         String tenant = strings.length > 2 ? strings[2] : "";
         String tag = event.tag;
-        
+        // 推送给Client端Config变更入口
         configDataChanged(groupKey, dataId, group, tenant, isBeta, betaIps, tag);
         
     }

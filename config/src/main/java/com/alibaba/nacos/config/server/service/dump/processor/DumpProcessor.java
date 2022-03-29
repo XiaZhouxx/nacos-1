@@ -44,7 +44,12 @@ public class DumpProcessor implements NacosTaskProcessor {
     public DumpProcessor(DumpService dumpService) {
         this.dumpService = dumpService;
     }
-    
+
+    /**
+     * 处理配置的变更以及转储
+     * @param task     task.
+     * @return
+     */
     @Override
     public boolean process(NacosTask task) {
         final PersistService persistService = dumpService.getPersistService();

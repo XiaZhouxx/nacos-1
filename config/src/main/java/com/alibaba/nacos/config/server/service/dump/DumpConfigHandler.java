@@ -82,6 +82,7 @@ public class DumpConfigHandler extends Subscriber<ConfigDumpEvent> {
             
             boolean result;
             if (!event.isRemove()) {
+                // 触发本地变更
                 result = ConfigCacheService.dump(dataId, group, namespaceId, content, lastModified, type);
                 
                 if (result) {

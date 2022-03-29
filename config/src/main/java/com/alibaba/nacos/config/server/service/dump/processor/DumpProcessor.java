@@ -46,7 +46,7 @@ public class DumpProcessor implements NacosTaskProcessor {
     }
 
     /**
-     * 处理配置的变更以及转储
+     * 处理配置的变更以及转储.
      * @param task     task.
      * @return
      */

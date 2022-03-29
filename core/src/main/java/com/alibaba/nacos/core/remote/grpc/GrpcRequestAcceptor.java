@@ -71,9 +71,9 @@ public class GrpcRequestAcceptor extends RequestGrpc.RequestImplBase {
     }
 
     /**
-     * 接收gRPC请求处理
-     * @param grpcRequest
-     * @param responseObserver
+     * 接收gRPC请求处理.
+     * @param grpcRequest ss
+     * @param responseObserver aa
      */
     @Override
     public void request(Payload grpcRequest, StreamObserver<Payload> responseObserver) {

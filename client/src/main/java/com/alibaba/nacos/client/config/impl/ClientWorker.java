@@ -88,7 +88,6 @@ import static com.alibaba.nacos.api.common.Constants.ENCODE;
 
 /**
  * Long polling.
- *
  * Client 监听/获取 config基类
  *
  * @see com.alibaba.nacos.client.config.NacosConfigService

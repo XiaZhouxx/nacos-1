@@ -40,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * The manager of {@code ConnectionBasedClient}.
- *
  * 通过继承监听器基类，当Client连接后,ConnectingManager 会调用ClientConnectionEventListener.clientConnected(Connection connect)
  * 以此保存Client连接信息, 当client真正发起Register请求时会使用这个Client实体 InstanceRequestHandler
  *
@@ -142,7 +141,7 @@ public class ConnectionBasedClientManager extends ClientConnectionEventListener 
     }
 
     /**
-     * Client连接过期剔除
+     * Client连接过期剔除.
      */
     private static class ExpiredClientCleaner implements Runnable {
         

@@ -91,7 +91,7 @@ public class DistroClientDataProcessor extends SmartSubscriber implements Distro
     }
 
     /**
-     * Distor协议 根据事件异步同步数据到Nacos集群其他节点
+     * Distor协议 根据事件异步同步数据到Nacos集群其他节点.
      * @param event {@link Event}
      */
     @Override

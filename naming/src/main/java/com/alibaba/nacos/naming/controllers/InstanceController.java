@@ -69,7 +69,6 @@ import static com.alibaba.nacos.naming.misc.UtilsAndCommons.DEFAULT_CLUSTER_NAME
 
 /**
  * Instance operation controller.
- *
  * 2.0.0 版本以前, 通过暴露Restful标准的Web接口对外提供对于服务实例的一系列操作
  * 在这之后, Controller只作为非临时实例和可视化控制台的请求处理
  *

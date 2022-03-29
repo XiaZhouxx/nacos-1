@@ -121,7 +121,7 @@ public class RpcConfigChangeNotifier extends Subscriber<LocalDataChangeEvent> {
     }
 
     /**
-     * 处理本地配置变更 推送Client端变更数据 这里的调用链路比较复杂, 它首先利用ConfigDataChangeEvent事件将数据同步给cluster,
+     * 处理本地配置变更 推送Client端变更数据 这里的调用链路比较复杂, 它首先利用ConfigDataChangeEvent事件将数据同步给cluster.
      * 由cluster同步接口来处理配置变更,最终触发 ConfigCacheService 中的LocalDataChangeEvent
      * @param event {@link Event}
      */

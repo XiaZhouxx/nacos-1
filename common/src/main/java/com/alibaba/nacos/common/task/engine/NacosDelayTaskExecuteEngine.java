@@ -165,7 +165,10 @@ public class NacosDelayTaskExecuteEngine extends AbstractNacosTaskExecuteEngine<
         task.setLastProcessTime(System.currentTimeMillis());
         addTask(key, task);
     }
-    
+
+    /**
+     * 任务处理线程.
+     */
     private class ProcessRunnable implements Runnable {
         
         @Override

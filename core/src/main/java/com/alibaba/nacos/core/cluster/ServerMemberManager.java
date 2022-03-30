@@ -451,6 +451,7 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
         }
         getSelf().setState(NodeState.UP);
         if (!EnvUtil.getStandaloneMode()) {
+            // 调度一个信息上报的线程去向集群的其他成员上报节点信息
             GlobalExecutor.scheduleByCommon(this.infoReportTask, DEFAULT_TASK_DELAY_TIME);
         }
         EnvUtil.setPort(event.getWebServer().getPort());
@@ -500,7 +501,7 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
     
     // Synchronize the metadata information of a node
     // A health check of the target node is also attached
-    
+    // 集群节点间元数据同步以及健康检测
     class MemberInfoReportTask extends Task {
         
         private final GenericType<RestResult<String>> reference = new GenericType<RestResult<String>>() {

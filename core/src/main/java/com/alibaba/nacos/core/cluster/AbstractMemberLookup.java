@@ -50,6 +50,13 @@ public abstract class AbstractMemberLookup implements MemberLookup {
     @Override
     public void start() throws NacosException {
         if (start.compareAndSet(false, true)) {
+            /*
+             * 两种启动方式
+             * 1. standalone 单机模式
+             * 2. (默认)cluster 集群模式, 此时是需要得到集群节点连接信息. 此时获取节点信息又有两种模式
+             *  2.1 FileConfigMemberLookup, 由cluster.conf维护集群节点间的地址信息 Nacos会监听这个file的变动, 但是变动需要去修改所有节点的conf, 较难维护
+             *  2.2 AddressServerMemberLookup, 远程地址服务 专门维护集群节点信息, 所有节点连接这个地址服务, 维护简单。
+             */
             doStart();
         }
     }

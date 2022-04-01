@@ -501,7 +501,7 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
     
     // Synchronize the metadata information of a node
     // A health check of the target node is also attached
-    // 集群节点间元数据同步以及健康检测
+    // 集群节点间元数据同步以及健康监测
     class MemberInfoReportTask extends Task {
         
         private final GenericType<RestResult<String>> reference = new GenericType<RestResult<String>>() {

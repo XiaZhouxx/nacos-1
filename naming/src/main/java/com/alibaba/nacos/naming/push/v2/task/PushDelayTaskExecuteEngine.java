@@ -58,6 +58,8 @@ public class PushDelayTaskExecuteEngine extends NacosDelayTaskExecuteEngine {
         this.metadataManager = metadataManager;
         this.pushExecutor = pushExecutor;
         this.switchDomain = switchDomain;
+        // 抽象的任务执行引擎可以对TaskProcessor设一个key, 添加Task也会指定一个key, 然后可以对某些key采用不同的任务执行器
+        // 这个类为了更好的抽离业务含义? 在不需要指定task指定processor时就直接设置和采用默认即可
         setDefaultTaskProcessor(new PushDelayTaskProcessor(this));
     }
     

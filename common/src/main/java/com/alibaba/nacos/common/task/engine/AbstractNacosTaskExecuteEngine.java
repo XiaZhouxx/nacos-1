@@ -27,6 +27,12 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Abstract nacos task execute engine.
  *
+ * Nacos 任务执行引擎
+ *
+ * 任务和任务执行器都一个, 任务执行器由map构成, 而新增Task需要指定一个key,
+ * 当任务执行时 即可根据TaskKey获取指定的执行器处理, 当然可以不配置Map内的处理器.
+ * 直接采用 defaultTaskProcessor.
+ *
  * @author xiweng.yy
  */
 public abstract class AbstractNacosTaskExecuteEngine<T extends NacosTask> implements NacosTaskExecuteEngine<T> {

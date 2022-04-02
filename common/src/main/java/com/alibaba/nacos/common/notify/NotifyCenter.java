@@ -204,12 +204,13 @@ public class NotifyCenter {
      */
     private static void addSubscriber(final Subscriber consumer, Class<? extends Event> subscribeType,
             EventPublisherFactory factory) {
-        
+        // 消费者同理, 它也需要指定一个消费的topic(event)与之绑定
         final String topic = ClassUtils.getCanonicalName(subscribeType);
         synchronized (NotifyCenter.class) {
             // MapUtils.computeIfAbsent is a unsafe method.
             MapUtil.computeIfAbsent(INSTANCE.publisherMap, topic, factory, subscribeType, ringBufferSize);
         }
+        // 给真正的Topic实体(EventPublisher) 注册上消费者
         EventPublisher publisher = INSTANCE.publisherMap.get(topic);
         if (publisher instanceof ShardedEventPublisher) {
             ((ShardedEventPublisher) publisher).addSubscriber(consumer, subscribeType);
@@ -294,9 +295,9 @@ public class NotifyCenter {
         if (ClassUtils.isAssignableFrom(SlowEvent.class, eventType)) {
             return INSTANCE.sharePublisher.publish(event);
         }
-        
+        // 根据命名可以看出, 实际上发布事件的设计类似消息队列的形式, Event的类名实际上就是Topic名称
         final String topic = ClassUtils.getCanonicalName(eventType);
-        
+        // 而EventPublisher其实就等同于Topic, Topic收到一条消息(Event)后, 将其发送给所有消费者(Subscriber)
         EventPublisher publisher = INSTANCE.publisherMap.get(topic);
         if (publisher != null) {
             return publisher.publish(event);

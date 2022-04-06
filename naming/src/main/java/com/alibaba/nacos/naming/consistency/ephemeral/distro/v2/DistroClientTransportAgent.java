@@ -43,6 +43,10 @@ import java.util.concurrent.Executor;
 
 /**
  * Distro transport agent for v2.
+ * Distro 协议传输实现基类.
+ * 封装了一系列同步数据方法, v2版本(nacos 2.0.x长连接),当然最底层的传输实现还是通过Grpc长连接.
+ * v1 {@link com.alibaba.nacos.naming.consistency.ephemeral.distro.component.DistroHttpAgent}
+ * @see ClusterRpcClientProxy
  *
  * @author xiweng.yy
  */

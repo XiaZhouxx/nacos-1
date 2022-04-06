@@ -48,8 +48,7 @@ import static com.alibaba.nacos.api.exception.NacosException.CLIENT_INVALID_PARA
 
 /**
  * cluster rpc client proxy.
- * 集群节点间 进行rpc交互的客户端代理. 目前看来大多用于distro协议请求.
- * {@link com.alibaba.nacos.naming.consistency.ephemeral.distro.v2.DistroClientTransportAgent}
+ *
  * @author liuzunfei
  * @version $Id: ClusterRpcClientProxy.java, v 0.1 2020年08月11日 2:11 PM liuzunfei Exp $
  */

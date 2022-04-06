@@ -87,6 +87,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *                        └──────────────────┘
  * </pre>
  *
+ * TODO CP实现.
+ *
  * @author <a href="mailto:liaochuntao@live.com">liaochuntao</a>
  */
 @SuppressWarnings("all")

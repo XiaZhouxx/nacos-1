@@ -25,6 +25,8 @@ import java.util.Set;
 /**
  * Distro component holder.
  *
+ * Distro协议实现比较核心的一个类, 持有了所有的基础组件.
+ *
  * @author xiweng.yy
  */
 @Component

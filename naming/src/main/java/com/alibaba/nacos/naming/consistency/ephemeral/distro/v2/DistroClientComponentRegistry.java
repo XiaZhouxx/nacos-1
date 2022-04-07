@@ -22,6 +22,7 @@ import com.alibaba.nacos.core.distributed.distro.DistroProtocol;
 import com.alibaba.nacos.core.distributed.distro.component.DistroComponentHolder;
 import com.alibaba.nacos.core.distributed.distro.component.DistroTransportAgent;
 import com.alibaba.nacos.core.distributed.distro.task.DistroTaskEngineHolder;
+import com.alibaba.nacos.naming.consistency.ephemeral.distro.DistroHttpRegistry;
 import com.alibaba.nacos.naming.core.v2.client.manager.ClientManager;
 import com.alibaba.nacos.naming.core.v2.client.manager.ClientManagerDelegate;
 import com.alibaba.nacos.naming.core.v2.upgrade.UpgradeJudgement;
@@ -31,7 +32,12 @@ import javax.annotation.PostConstruct;
 
 /**
  * Distro component registry for v2.
+ * V2 Distro 组件的注册表, 它利用Spring依赖注入机制, 通过构造函数声明依赖组件.
+ * 然后通过Spring初始化方法机制统一处理这些组件的注册.
  *
+ * 这个类似于Spring注解方式的配置Bean类,没有其他类对此类的逻辑引用.
+ *
+ * V1 {@link DistroHttpRegistry}
  * @author xiweng.yy
  */
 @Component

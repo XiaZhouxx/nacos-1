@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * Execute distro verify task.
- *
+ * Distro 维护集群节点心跳以及数据同步校验任务.
  * @author xiweng.yy
  */
 public class DistroVerifyExecuteTask extends AbstractExecuteTask {
@@ -53,6 +53,7 @@ public class DistroVerifyExecuteTask extends AbstractExecuteTask {
     public void run() {
         for (DistroData each : verifyData) {
             try {
+                // 2.0.x长连接支持, 低版本不支持回调
                 if (transportAgent.supportCallbackTransport()) {
                     doSyncVerifyDataWithCallback(each);
                 } else {

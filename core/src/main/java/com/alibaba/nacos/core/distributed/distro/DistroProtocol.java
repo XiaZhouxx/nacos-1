@@ -64,7 +64,9 @@ public class DistroProtocol {
             isInitialized = true;
             return;
         }
+        // 数据校验定时任务, 由当前节点主动发送自己实例数据, 由其他节点校验, 延迟5秒/之后间隔5秒执行.
         startVerifyTask();
+        // 首次启动加入集群时, 从集群中拉取数据的task
         startLoadTask();
     }
     

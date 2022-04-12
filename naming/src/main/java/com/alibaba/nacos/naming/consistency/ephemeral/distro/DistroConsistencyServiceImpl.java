@@ -66,6 +66,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * <p>At mean time every Nacos server receives data sync of other Nacos server, so every Nacos server will eventually
  * have a complete set of data.
  *
+ * <p> RestFul web接口方式 v1版本采用的一致性服务, Nacos 实际上不同的实例可能由不同的节点来维护(增、删、改), 由整个集群节点构成一个总的数据集
+ * 通过集群各个节点分别上报自己的校验元数据, 故集群中虽然每个节点只负责部分实例, 但是会拥有总的实例副本
+ *
  * @author nkorange
  * @since 1.0.0
  */

@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Distro load data task.
- *
+ * Distro 协议从集群节点中同步数据Task
  * @author xiweng.yy
  */
 public class DistroLoadDataTask implements Runnable {
@@ -105,6 +105,7 @@ public class DistroLoadDataTask implements Runnable {
                 Loggers.DISTRO
                         .info("[DISTRO-INIT] load snapshot {} from {} result: {}", resourceType, each.getAddress(),
                                 result);
+                // 遍历集群节点, 有一个成功则同步完成.
                 if (result) {
                     distroComponentHolder.findDataStorage(resourceType).finishInitial();
                     return true;

@@ -276,7 +276,7 @@ public class DistroClientTransportAgent implements DistroTransportAgent {
                 NamingTpsMonitor.distroVerifySuccess(member.getAddress(), member.getIp());
                 distroCallback.onSuccess();
             } else {
-                // 目标节点校验失败, 向目标节点同步数据
+                // 目标节点校验失败, 向目标节点同步数据 DistroClientDataProcessor
                 Loggers.DISTRO.info("Target {} verify client {} failed, sync new client", targetServer, clientId);
                 NotifyCenter.publishEvent(new ClientEvent.ClientVerifyFailedEvent(clientId, targetServer));
                 NamingTpsMonitor.distroVerifyFail(member.getAddress(), member.getIp());

@@ -105,10 +105,15 @@ public class DistroClientDataProcessor extends SmartSubscriber implements Distro
         if (event instanceof ClientEvent.ClientVerifyFailedEvent) {
             syncToVerifyFailedServer((ClientEvent.ClientVerifyFailedEvent) event);
         } else {
+            // 其他事件 -> subscribeTypes() 则需要同步到所有集群节点.
             syncToAllServer((ClientEvent) event);
         }
     }
-    
+
+    /**
+     * 同步数据到校验失败的服务.
+     * @param event 校验失败事件
+     */
     private void syncToVerifyFailedServer(ClientEvent.ClientVerifyFailedEvent event) {
         Client client = clientManager.getClient(event.getClientId());
         if (null == client || !client.isEphemeral() || !clientManager.isResponsibleClient(client)) {

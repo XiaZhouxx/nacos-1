@@ -49,6 +49,7 @@ public final class LookupFactory {
      * @throws NacosException NacosException
      */
     public static MemberLookup createLookUp(ServerMemberManager memberManager) throws NacosException {
+        // 除了独立模式, 还存在 file 和 address-server两种方式.
         if (!EnvUtil.getStandaloneMode()) {
             String lookupType = EnvUtil.getProperty(LOOKUP_MODE_TYPE);
             LookupType type = chooseLookup(lookupType);
@@ -105,7 +106,7 @@ public final class LookupFactory {
         // unpossible to run here
         throw new IllegalArgumentException();
     }
-    
+
     private static LookupType chooseLookup(String lookupType) {
         if (StringUtils.isNotBlank(lookupType)) {
             LookupType type = LookupType.sourceOf(lookupType);
@@ -127,7 +128,10 @@ public final class LookupFactory {
     public static void destroy() throws NacosException {
         Objects.requireNonNull(LOOK_UP).destroy();
     }
-    
+
+    /**
+     * 启动模式类型. conf文件
+     */
     public enum LookupType {
         
         /**

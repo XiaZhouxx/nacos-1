@@ -392,6 +392,11 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
         // that the event publication is sequential
         if (hasChange) {
             MemberUtil.syncToFile(finalMembers);
+            /*
+            *发布一个成员变更事件.
+            * ClusterRpcClientProxy负责和集群节点建立连接
+            * ProtocolManager 负责对应不同一致性协议 成员变更的操作.
+            */
             Event event = MembersChangeEvent.builder().members(finalMembers).build();
             NotifyCenter.publishEvent(event);
         }
@@ -516,7 +521,7 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
             if (members.isEmpty()) {
                 return;
             }
-            
+            // 轮询集群成员进行元数据数据上报.
             this.cursor = (this.cursor + 1) % members.size();
             Member target = members.get(cursor);
             

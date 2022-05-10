@@ -393,9 +393,9 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
         if (hasChange) {
             MemberUtil.syncToFile(finalMembers);
             /*
-            *发布一个成员变更事件.
-            * ClusterRpcClientProxy负责和集群节点建立连接
-            * ProtocolManager 负责对应不同一致性协议 成员变更的操作.
+            * 发布一个成员变更事件.
+            * ClusterRpcClientProxy 负责和集群节点建立连接
+            * ProtocolManager 负责对应不同一致性协议时对于成员变更的操作.
             */
             Event event = MembersChangeEvent.builder().members(finalMembers).build();
             NotifyCenter.publishEvent(event);

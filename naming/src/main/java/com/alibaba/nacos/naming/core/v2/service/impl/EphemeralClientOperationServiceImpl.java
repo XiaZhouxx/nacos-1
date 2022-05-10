@@ -55,6 +55,7 @@ public class EphemeralClientOperationServiceImpl implements ClientOperationServi
                     String.format("Current service %s is persistent service, can't register ephemeral instance.",
                             singleton.getGroupedServiceName()));
         }
+        // clientId 实际上是连接id
         Client client = clientManager.getClient(clientId);
         if (!clientIsLegal(client, clientId)) {
             return;

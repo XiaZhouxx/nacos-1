@@ -87,9 +87,11 @@ public class NacosNamingService implements NamingService {
         InitUtils.initSerialization();
         InitUtils.initWebRootContext(properties);
         initLogName(properties);
-        
+
         this.changeNotifier = new InstancesChangeNotifier();
+        // 可以理解为构建了一个消息队列的topic 名称为 InstancesChangeEvent
         NotifyCenter.registerToPublisher(InstancesChangeEvent.class, 16384);
+        // 然后注册一个消费者, 消费的Topic可以看Subscriber.subscribeType() 方法获取
         NotifyCenter.registerSubscriber(changeNotifier);
         this.serviceInfoHolder = new ServiceInfoHolder(namespace, properties);
         this.clientProxy = new NamingClientProxyDelegate(this.namespace, serviceInfoHolder, properties, changeNotifier);

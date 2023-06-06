@@ -50,6 +50,7 @@ import java.util.Map;
 
 /**
  * Distro filter.
+ * Distro 协议过滤器, 注册服务经过hash计算会指定对应的nacos服务端, 如果当前服务端不负责该实例, 则会转发请求到对应的Nacos服务端
  *
  * @author nacos
  */

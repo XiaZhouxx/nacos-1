@@ -85,6 +85,7 @@ public class ClientBeatCheckTask implements BeatCheckTask {
             if (ApplicationUtils.getBean(UpgradeJudgement.class).isUseGrpcFeatures()) {
                 return;
             }
+            // 判断当前服务器是否负责该实例, Distro会hash后分配实例对应的nacos服务端
             if (!getDistroMapper().responsible(service.getName())) {
                 return;
             }

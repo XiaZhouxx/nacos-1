@@ -103,10 +103,15 @@ public class DistroClientDataProcessor extends SmartSubscriber implements Distro
         if (!upgradeJudgement.isUseGrpcFeatures()) {
             return;
         }
+        // Distro 间隔5秒向集群其他节点校验自己数据失败的事件(这时存在数据不一致了) 去校验失败的服务同步数据
         if (event instanceof ClientEvent.ClientVerifyFailedEvent) {
             syncToVerifyFailedServer((ClientEvent.ClientVerifyFailedEvent) event);
         } else {
-            // 其他事件 -> subscribeTypes() 则需要同步到所有集群节点.
+            /**
+             *         result.add(ClientEvent.ClientChangedEvent.class);
+             *         result.add(ClientEvent.ClientDisconnectEvent.class);
+             *         其他事件
+             */
             syncToAllServer((ClientEvent) event);
         }
     }

@@ -408,6 +408,7 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
         
         @Override
         public void run() {
+            // Distro 通知实例变更线程
             Loggers.DISTRO.info("distro notifier started");
             
             for (; ; ) {

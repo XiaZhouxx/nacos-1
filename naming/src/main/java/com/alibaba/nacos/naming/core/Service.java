@@ -49,6 +49,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ *  * Nacos 注册服务实体,
+ *  * server -> cluster -> instance = 1 : N : N
+ *  *                  serviceA
+ *  *       clusterA              clusterB
+ *  * instanceA   instanceB  instanceC   instanceD
+ *
  * Service of Nacos server side
  *
  * <p>We introduce a 'service --> cluster --> instance' model, in which service stores a list of clusters, which

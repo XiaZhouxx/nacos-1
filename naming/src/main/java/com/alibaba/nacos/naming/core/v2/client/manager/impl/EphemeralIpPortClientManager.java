@@ -155,6 +155,7 @@ public class EphemeralIpPortClientManager implements ClientManager {
         
         private boolean isExpireClient(long currentTime, IpPortBasedClient client) {
             long noUpdatedTime = currentTime - client.getLastUpdatedTime();
+            // 客户端是临时实例 && ((没有上线的服务 && 30秒没有更新) && (该服务没有监听者 || 10秒没有更新) || 3分钟没有更新)
             return client.isEphemeral() && (
                     isExpirePublishedClient(noUpdatedTime, client) && isExpireSubscriberClient(noUpdatedTime, client)
                             || noUpdatedTime > ClientConfig.getInstance().getClientExpiredTime());

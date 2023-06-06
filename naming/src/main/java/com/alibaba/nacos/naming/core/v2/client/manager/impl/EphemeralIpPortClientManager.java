@@ -127,7 +127,10 @@ public class EphemeralIpPortClientManager implements ClientManager {
         }
         return false;
     }
-    
+
+    /**
+     * 客户端过期检测剔除线程
+     */
     private static class ExpiredClientCleaner implements Runnable {
         
         private final EphemeralIpPortClientManager clientManager;

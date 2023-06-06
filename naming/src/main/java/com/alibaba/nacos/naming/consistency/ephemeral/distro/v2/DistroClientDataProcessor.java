@@ -48,6 +48,7 @@ import java.util.Set;
 
 /**
  * Distro processor for v2.
+ * 长连接版本 Distro 对客户端实例数据的处理器
  *
  * @author xiweng.yy
  */

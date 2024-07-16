@@ -123,10 +123,11 @@ public class IpPortBasedClient extends AbstractClient {
     }
     
     /**
-     * Init client.
+     * Init client. ephemeral and persistent instance task init.
      */
     public void init() {
         if (ephemeral) {
+            // ephemeral instance use health beat check.
             beatCheckTask = new ClientBeatCheckTaskV2(this);
             HealthCheckReactor.scheduleCheck(beatCheckTask);
         } else {

@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.alibaba.nacos.common.utils.RandomUtils;
 
 /**
- * Health check task.
+ * Health check task. V1 版本对于持久化实例的主动探活（http/tcp/mysql三种探活方式）
  *
  * @author nacos
  */

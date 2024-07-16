@@ -32,7 +32,7 @@ import javax.annotation.PostConstruct;
 
 /**
  * Distro http registry.
- *
+ * 1.X 版本基于HTTP实现的 Distro
  * @author xiweng.yy
  */
 @Component

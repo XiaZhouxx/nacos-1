@@ -35,8 +35,8 @@ public String register(HttpServletRequest request) throws Exception {
 可以发现很多操作都是通过发布事件放入内存队列去异步执行的.
 #### CP 方式的注册服务
 `PersistentConsistencyServiceDelegateImpl` 1.4.0以下版本只能基于JRaft算法,
-而高版本已经扩展了CP的实现更通用和扩展, 可以接入DB或Redis实现持久化
-
+而高版本已经下沉CP的实现到内核将计算和存储分离,更通用和扩展, 可以接入DB或Redis实现持久化
+![img.png](img.png)
 #### Distro协议同步节点数据
 1. `DistroProtocol` Distro协议实现
    1. `DistroVerifyTimedTask` 定时每隔五秒向集群其他节点发送快照数据作校验

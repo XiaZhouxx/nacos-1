@@ -36,6 +36,10 @@ public String register(HttpServletRequest request) throws Exception {
 #### CP 方式的注册服务
 `PersistentConsistencyServiceDelegateImpl` 1.4.0以下版本只能基于JRaft算法,
 而高版本已经下沉CP的实现到内核将计算和存储分离,更通用和扩展, 可以接入DB或Redis实现持久化
+
+目前CP实现方式默认只有JRaft, 如果需要定制化接入外部存储来实现CP,可以实现 `CPProtocol` 接口
+`BasePersistentServiceProcessor` 一致性协议通用实现, 可以基于这个类的部分实现(onApply())自定义CP
+
 ![img.png](img.png)
 #### Distro协议同步节点数据
 1. `DistroProtocol` Distro协议实现
@@ -84,7 +88,7 @@ Nacos是集注册中心和配置中心为一体的中间件
 故采用自研的Distro 最终一致性协议(基于 Gossip 和 Eureka)
 
 而对于配置中心而言, 是直接在 Nacos 服务端进行创建并进行管理的，必须保证大部分的节点都保存了此配
-置数据才能认为配置被成功保存，故采用自研基于Raft的JRaft
+置数据才能认为配置被成功保存(在写入时可能不可用, 所以只能保证CP), 采用自研基于Raft的JRaft
 
 
 

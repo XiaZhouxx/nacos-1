@@ -70,6 +70,44 @@ Distro协议中 集群的每个节点只负责部分客户端的写入, 通过�
 
 异步通知触发配置变更通知 `RpcConfigChangeNotifier`
 
+
+客户端的本地刷新配置基于SpringCloud的 `RefreshEventListener` 当Nacos配置发生变更会发布 `RefreshEvent`
+1. 刷新配置, 这里就会触发Nacos的加载配置
+2. 删除Scope缓存, 这样下次调用对应`RefreshScope`类就会触发重新创建实例达到Bean感知配置变更的逻辑。
+
+通过Spring的Scope机制和SpringCloud的`@RefreshScope`注解 
+通过代理了目标类 在代理执行取目标对象时 DynamicAdvisedInterceptor.intercept()
+```java
+target = targetSource.getTarget();
+
+class SimpleBeanTargetSource {
+   public Object getTarget() throws Exception {
+      return getBeanFactory().getBean(getTargetBeanName());
+   }
+}
+
+// GenericScope 最后通过Scope机制
+public Object get(String name, ObjectFactory<?> objectFactory) {
+   // 如果发布了RefreshEvent, 这里缓存会被清理, 得到的则是new的BeanLifecycleWrapper。
+   BeanLifecycleWrapper value = this.cache.put(name, new BeanLifecycleWrapper(name, objectFactory));
+   this.locks.putIfAbsent(name, new ReentrantReadWriteLock());
+   try {
+       // getBean() 没有刷新情况下就使用缓存, 否则就是重新创建一个Bean达到刷新配置的效果
+//      return value.getBean();
+      if (this.bean == null) {
+         synchronized (this.name) {
+            if (this.bean == null) {
+               this.bean = this.objectFactory.getObject();
+            }
+         }
+      }
+   }
+   catch (RuntimeException e) {
+      this.errors.put(name, e);
+      throw e;
+   }
+}
+```
 ## 实例健康检测
 
 ### ephemeral 实例

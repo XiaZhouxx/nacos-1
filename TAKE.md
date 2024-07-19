@@ -76,6 +76,8 @@ TODO 这里认为一般公司的压力并不需要这个优化？这样的写入
 `ConfigController` publishConfig -> `ConfigInfoPersistService` (Embedded/External) ->  `ConfigDataChangeEvent` -> `AsyncNotifyService` listener -> notify Member `AsyncRpcTask` -> self Member `DumpService` dump local.
 -> `LocalDataChangeEvent` -> `RpcConfigChangeNotifier` -> notify clients `ConfigChangeNotifyRequest`.
 
+客户端 主动查询配置是否有变更`ClientWorker.executeConfigListen`  五分钟一次/服务端主动发起变更请求
+
 ## 实例健康检测
 基于长连接后, 客户端的每次请求都会维护心跳, 在`ConnectionManager`中会有定时任务定期清理超时连接/限制连接数
 也可以自己实现如何淘汰连接 `RuntimeConnectionEjector`

@@ -78,6 +78,45 @@ TODO 这里认为一般公司的压力并不需要这个优化？这样的写入
 
 客户端 主动查询配置是否有变更`ClientWorker.executeConfigListen`  五分钟一次/服务端主动发起变更请求
 
+### 客户端Spring感知配置变更
+客户端的本地刷新配置基于SpringCloud的 `RefreshEventListener` 当Nacos配置发生变更会发布 `RefreshEvent`
+1. 刷新配置, 这里就会触发Nacos的加载配置
+2. 删除Scope缓存, 这样下次调用对应`RefreshScope`类就会触发重新创建实例达到Bean感知配置变更的逻辑。
+
+通过Spring的Scope机制和SpringCloud的`@RefreshScope`注解
+通过代理了目标类 在代理执行取目标对象时 DynamicAdvisedInterceptor.intercept()
+```java
+target = targetSource.getTarget();
+
+class SimpleBeanTargetSource {
+   public Object getTarget() throws Exception {
+      return getBeanFactory().getBean(getTargetBeanName());
+   }
+}
+
+// GenericScope 最后通过Scope机制
+public Object get(String name, ObjectFactory<?> objectFactory) {
+   // 如果发布了RefreshEvent, 这里缓存会被清理, 得到的则是new的BeanLifecycleWrapper。
+   BeanLifecycleWrapper value = this.cache.put(name, new BeanLifecycleWrapper(name, objectFactory));
+   this.locks.putIfAbsent(name, new ReentrantReadWriteLock());
+   try {
+       // getBean() 没有刷新情况下就使用缓存, 否则就是重新创建一个Bean达到刷新配置的效果
+//      return value.getBean();
+      if (this.bean == null) {
+         synchronized (this.name) {
+            if (this.bean == null) {
+               this.bean = this.objectFactory.getObject();
+            }
+         }
+      }
+   }
+   catch (RuntimeException e) {
+      this.errors.put(name, e);
+      throw e;
+   }
+}
+```
+
 ## 实例健康检测
 基于长连接后, 客户端的每次请求都会维护心跳, 在`ConnectionManager`中会有定时任务定期清理超时连接/限制连接数
 也可以自己实现如何淘汰连接 `RuntimeConnectionEjector`

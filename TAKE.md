@@ -155,7 +155,12 @@ Nacos是集注册中心和配置中心为一体的中间件
 ## 注意事项
 
 1. 2.x 基于长链接需要暴露一定的端口
-   ![img_1.png](img_1.png)
+基于长连接需要暴露额外的端口来进行rpc连接，如果需要修改需要同步客户端和服务端
+   1. 用于客户端rpc请求的端口 NacosPort(8848) + offset(1000);GrpcSdkServer/GrpcSdkClient
+   2. 用于集群之间同步信息的rpc连接端口 NacosPort(8848) + offset(1001); GrpcClusterServer/GrpcClusterClient
+   3. 用于Raft算法选举的端口(新老版本都有的逻辑) NacosPort(8848) - offset(1000); MemberUtil
+
+一共需要的则是四个端口 8848 7848 9848 9849
 
 2. 2.x 早期版本因为需要兼容1.x版本提供了双写机制, 如果稳定运行2.x版本后一定要关闭双写
    要么修改源码 SwitchDomain 要么调用接口OperatorController.updateSwitch entry=doubleWriteEnabled value=false

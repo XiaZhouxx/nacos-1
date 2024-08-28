@@ -39,6 +39,7 @@ import com.alibaba.nacos.naming.consistency.persistent.impl.BatchReadResponse;
 import com.alibaba.nacos.naming.consistency.persistent.impl.BatchWriteRequest;
 import com.alibaba.nacos.naming.consistency.persistent.impl.OldDataOperation;
 import com.alibaba.nacos.naming.pojo.Record;
+import com.alibaba.nacos.sys.env.EnvUtil;
 import com.alibaba.nacos.sys.utils.DiskUtils;
 import com.google.protobuf.ByteString;
 import org.springframework.http.HttpStatus;
@@ -87,12 +88,21 @@ public class SwitchManager extends RequestProcessor4CP {
         this.serializer = SerializeFactory.getSerializer("JSON");
         this.snapshotOperation = new SwitchDomainSnapshotOperation(this.raftLock, this, this.serializer);
         this.dataFile = Paths.get(UtilsAndCommons.DATA_BASE_DIR, "data", KeyBuilder.getSwitchDomainKey()).toFile();
+        
+        init();
+    }
+    
+    private void init() {
         try {
             DiskUtils.forceMkdir(this.dataFile.getParent());
         } catch (IOException e) {
             Loggers.RAFT.error("Init Switch Domain directory failed: ", e);
         }
-        protocolManager.getCpProtocol().addRequestProcessors(Collections.singletonList(this));
+        if (EnvUtil.getStandaloneMode()) {
+            doLoadSnapshot();
+        } else {
+            protocolManager.getCpProtocol().addRequestProcessors(Collections.singletonList(this));
+        }
     }
     
     /**
@@ -364,9 +374,17 @@ public class SwitchManager extends RequestProcessor4CP {
     
     private void updateWithConsistency(SwitchDomain tempSwitchDomain) throws NacosException {
         try {
-            final BatchWriteRequest req = new BatchWriteRequest();
             String switchDomainKey = KeyBuilder.getSwitchDomainKey();
             Datum datum = Datum.createDatum(switchDomainKey, tempSwitchDomain);
+            
+            if (EnvUtil.getStandaloneMode()) {
+                DiskUtils.touch(this.dataFile);
+                DiskUtils.writeFile(this.dataFile, serializer.serialize(datum), false);
+                update(tempSwitchDomain);
+                return;
+            }
+            
+            final BatchWriteRequest req = new BatchWriteRequest();
             req.append(ByteUtils.toBytes(switchDomainKey), serializer.serialize(datum));
             WriteRequest operationLog = WriteRequest.newBuilder().setGroup(group())
                     .setOperation(OldDataOperation.Write.getDesc()).setData(ByteString.copyFrom(serializer.serialize(req)))
@@ -403,22 +421,26 @@ public class SwitchManager extends RequestProcessor4CP {
                 DiskUtils.deleteDirThenMkdir(baseDir);
                 File descDir = Paths.get(baseDir).toFile();
                 DiskUtils.copyDirectory(srcDir, descDir);
-                if (!this.dataFile.exists()) {
-                    return;
-                }
-                byte[] snapshotData = DiskUtils.readFileBytes(this.dataFile);
-                final Datum datum = serializer.deserialize(snapshotData, getDatumType());
-                final Record value = null != datum ? datum.value : null;
-                if (!(value instanceof SwitchDomain)) {
-                    return;
-                }
-                update((SwitchDomain) value);
+                doLoadSnapshot();
             }
         } catch (IOException e) {
             throw new NacosRuntimeException(ErrorCode.IOCopyDirError.getCode(), e);
         } finally {
             this.raftLock.writeLock().unlock();
         }
+    }
+    
+    private void doLoadSnapshot() {
+        if (!this.dataFile.exists()) {
+            return;
+        }
+        byte[] snapshotData = DiskUtils.readFileBytes(this.dataFile);
+        final Datum datum = serializer.deserialize(snapshotData, getDatumType());
+        final Record value = null != datum ? datum.value : null;
+        if (!(value instanceof SwitchDomain)) {
+            return;
+        }
+        update((SwitchDomain) value);
     }
     
     /**

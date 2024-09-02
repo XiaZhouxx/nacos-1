@@ -37,6 +37,8 @@ public class SwitchEntry {
     
     public static final String CLIENT_GO = "go";
     
+    public static final String CLIENT_CSHARP = "csharp";
+    
     public static final String CLIENT_PYTHON = "python";
     
     public static final String PUSH_CACHE_MILLIS = "pushCacheMillis";
@@ -64,6 +66,12 @@ public class SwitchEntry {
     public static final String LIMITED_URL_MAP = "limitedUrlMap";
     
     public static final String ENABLE_STANDALONE = "enableStandalone";
+    
+    public static final String HTTP_HEALTH_PARAMS = "httpHealthParams";
+    
+    public static final String TCP_HEALTH_PARAMS = "tcpHealthParams";
+    
+    public static final String MYSQL_HEALTH_PARAMS = "mysqlHealthParams";
     
     public static final int MIN_PUSH_CACHE_TIME_MIILIS = 10000;
     

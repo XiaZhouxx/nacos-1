@@ -18,6 +18,7 @@ package com.alibaba.nacos.naming.misc;
 
 import com.alibaba.nacos.api.common.Constants;
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.api.exception.runtime.NacosDeserializationException;
 import com.alibaba.nacos.api.exception.runtime.NacosRuntimeException;
 import com.alibaba.nacos.common.utils.ByteUtils;
 import com.alibaba.nacos.common.utils.ConvertUtils;
@@ -310,6 +311,24 @@ public class SwitchManager extends RequestProcessor4CP {
                 tempSwitchDomain.setAutoChangeHealthCheckEnabled(ConvertUtils.toBoolean(value));
             }
             
+            try {
+                if (SwitchEntry.HTTP_HEALTH_PARAMS.equals(entry)) {
+                    SwitchDomain.HttpHealthParams httpHealthParams = JacksonUtils.toObj(value, SwitchDomain.HttpHealthParams.class);
+                    tempSwitchDomain.setHttpHealthParams(httpHealthParams);
+                    validateHealthParams(httpHealthParams);
+                }
+                if (SwitchEntry.TCP_HEALTH_PARAMS.equals(entry)) {
+                    SwitchDomain.TcpHealthParams tcpHealthParams = JacksonUtils.toObj(value, SwitchDomain.TcpHealthParams.class);
+                    tempSwitchDomain.setTcpHealthParams(tcpHealthParams);
+                    validateHealthParams(tcpHealthParams);
+                }
+                if (SwitchEntry.MYSQL_HEALTH_PARAMS.equals(entry)) {
+                    tempSwitchDomain.setMysqlHealthParams(JacksonUtils.toObj(value, SwitchDomain.MysqlHealthParams.class));
+                }
+            } catch (NacosDeserializationException e) {
+                throw new IllegalArgumentException("json param invalid.");
+            }
+            
             if (debug) {
                 update(tempSwitchDomain);
             } else {
@@ -320,6 +339,27 @@ public class SwitchManager extends RequestProcessor4CP {
             this.requestLock.unlock();
         }
         
+    }
+    
+    /**
+     * Validate health params
+     *
+     * @param healthParams health params
+     */
+    public void validateHealthParams(SwitchDomain.HealthParams healthParams) {
+        if (healthParams.getMin() < SwitchDomain.HttpHealthParams.MIN_MIN) {
+            throw new IllegalArgumentException("min check time for http or tcp is too small(<500)");
+        }
+        
+        if (healthParams.getMax() < SwitchDomain.HttpHealthParams.MIN_MAX) {
+            
+            throw new IllegalArgumentException("max check time for http or tcp is too small(<3000)");
+        }
+        
+        if (healthParams.getFactor() < 0 || healthParams.getFactor() > 1) {
+            
+            throw new IllegalArgumentException("malformed factor");
+        }
     }
     
     /**

@@ -317,27 +317,6 @@ public class SwitchManager extends RequestProcessor4CP {
     }
     
     /**
-     * Validate health params
-     *
-     * @param healthParams health params
-     */
-    public void validateHealthParams(SwitchDomain.HealthParams healthParams) {
-        if (healthParams.getMin() < SwitchDomain.HttpHealthParams.MIN_MIN) {
-            throw new IllegalArgumentException("min check time for http or tcp is too small(<500)");
-        }
-        
-        if (healthParams.getMax() < SwitchDomain.HttpHealthParams.MIN_MAX) {
-            
-            throw new IllegalArgumentException("max check time for http or tcp is too small(<3000)");
-        }
-        
-        if (healthParams.getFactor() < 0 || healthParams.getFactor() > 1) {
-            
-            throw new IllegalArgumentException("malformed factor");
-        }
-    }
-    
-    /**
      * Update switch information from new switch domain.
      *
      * @param newSwitchDomain new switch domain
@@ -375,6 +354,27 @@ public class SwitchManager extends RequestProcessor4CP {
         switchDomain.setOverriddenServerStatus(newSwitchDomain.getOverriddenServerStatus());
         switchDomain.setDefaultInstanceEphemeral(newSwitchDomain.isDefaultInstanceEphemeral());
         switchDomain.setLightBeatEnabled(newSwitchDomain.isLightBeatEnabled());
+    }
+    
+    /**
+     * Validate health params.
+     *
+     * @param healthParams health params
+     */
+    public void validateHealthParams(SwitchDomain.HealthParams healthParams) {
+        if (healthParams.getMin() < SwitchDomain.HttpHealthParams.MIN_MIN) {
+            throw new IllegalArgumentException("min check time for http or tcp is too small(<500)");
+        }
+        
+        if (healthParams.getMax() < SwitchDomain.HttpHealthParams.MIN_MAX) {
+            
+            throw new IllegalArgumentException("max check time for http or tcp is too small(<3000)");
+        }
+        
+        if (healthParams.getFactor() < 0 || healthParams.getFactor() > 1) {
+            
+            throw new IllegalArgumentException("malformed factor");
+        }
     }
     
     private void updateWithConsistency(SwitchDomain tempSwitchDomain) throws NacosException {

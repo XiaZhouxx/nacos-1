@@ -111,31 +111,6 @@ public class SwitchManager extends RequestProcessor4CP {
             
             SwitchDomain tempSwitchDomain = this.switchDomain.clone();
             
-            if (SwitchEntry.BATCH.equals(entry)) {
-                //batch update
-                SwitchDomain dom = JacksonUtils.toObj(value, SwitchDomain.class);
-                dom.setEnableStandalone(tempSwitchDomain.isEnableStandalone());
-                if (dom.getHttpHealthParams().getMin() < SwitchDomain.HttpHealthParams.MIN_MIN
-                        || dom.getTcpHealthParams().getMin() < SwitchDomain.HttpHealthParams.MIN_MIN) {
-                    
-                    throw new IllegalArgumentException("min check time for http or tcp is too small(<500)");
-                }
-                
-                if (dom.getHttpHealthParams().getMax() < SwitchDomain.HttpHealthParams.MIN_MAX
-                        || dom.getTcpHealthParams().getMax() < SwitchDomain.HttpHealthParams.MIN_MAX) {
-                    
-                    throw new IllegalArgumentException("max check time for http or tcp is too small(<3000)");
-                }
-                
-                if (dom.getHttpHealthParams().getFactor() < 0 || dom.getHttpHealthParams().getFactor() > 1
-                        || dom.getTcpHealthParams().getFactor() < 0 || dom.getTcpHealthParams().getFactor() > 1) {
-                    
-                    throw new IllegalArgumentException("malformed factor");
-                }
-                
-                tempSwitchDomain = dom;
-            }
-            
             if (entry.equals(SwitchEntry.DISTRO_THRESHOLD)) {
                 float threshold = Float.parseFloat(value);
                 if (threshold <= 0) {
